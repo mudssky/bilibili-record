@@ -38,7 +38,7 @@
     "watch": "tsc -w"
   },
   "lint-staged": {
-    "**/*.{js,jsx}": [
+    "**/*.{js,jsx,ts}": [
       "eslint",
       "prettier  --write"
     ],
