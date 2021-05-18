@@ -6,7 +6,8 @@
   "dependencies": {
     "commander": "^7.2.0",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "node-fetch-progress": "^1.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.18",
@@ -35,7 +36,8 @@
   "scripts": {
     "test": "mocha",
     "prepare": "husky install",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "cli": "npx ts-node ./src/bilibili-record-cli/bilibili-record-cli.ts"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts}": [

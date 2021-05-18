@@ -1,7 +1,10 @@
 import { Command } from 'commander'
 import bilibiliLiveAPI from '../bilibiliAPI/bilibiliLiveAPI'
 import download from '../download/download'
-
+import { retryOnError } from '../util/exception'
+import fs from 'fs'
+import path from 'path'
+import { promisify } from 'util'
 const program = new Command()
 program.version('0.0.1')
 
@@ -23,6 +26,18 @@ program
     '下载直播流存放的目录',
     '{roomID}-{uname}'
   )
+  .option(
+    '-rt --retry-times <number>',
+    '下载中出现错误后重试的次数',
+    parseInt,
+    100
+  )
+  .option(
+    '-ri --retry-interval <seconds>',
+    '下载出错重试的时间间隔',
+    parseInt,
+    100
+  )
 
 program.parse(process.argv)
 const options = program.opts()
@@ -31,23 +46,48 @@ if (options.debug) {
 }
 // 避免await顶层调用
 ;(async function () {
-  console.log('roomid:', options.roomID)
+  // console.dir('roomid:', options.roomID)
   const [liveOptions, durlObj] = await Promise.all([
     bilibiliLiveAPI.collectRoomData(options.roomID),
     bilibiliLiveAPI.getRoomVideoData(options.roomID),
   ])
-  console.log(liveOptions)
-  console.log(durlObj.data.durl)
+  if (options.debug) {
+    console.log('live options:')
+    console.dir(liveOptions)
+    console.log('durl:')
+    console.dir(durlObj.data.durl)
+  }
   if (durlObj.code === 0) {
     const durl = durlObj.data.durl
-    if (durl) {
-      download.downloadFlvStream(
-        durl[0].url,
-        bilibiliLiveAPI.parseFilenameTemplate(
-          options.filenameTemplate,
-          liveOptions
-        )
+
+    const downloadFN = async function () {
+      const filename = await bilibiliLiveAPI.parseFilenameTemplate(
+        options.filenameTemplate,
+        liveOptions
       )
+      const downloadDir = await bilibiliLiveAPI.parseFilenameTemplate(
+        options.downloadDir,
+        liveOptions
+      )
+      const mkdirPromise = promisify(fs.mkdir)
+      try {
+        await mkdirPromise(downloadDir)
+      } catch (e) {
+        console.log(e)
+      }
+      const filePath = path.join(downloadDir, filename)
+      await download.downloadFlvStream(
+        {
+          streamURL: durl[0].url,
+          roomID: options.roomID,
+        },
+        filePath
+      )
+    }
+    if (durl) {
+      retryOnError(downloadFN, options.retryTimes, 100)
+    } else {
+      console.error(`请求失败，durl${durl}`)
     }
   }
 })()

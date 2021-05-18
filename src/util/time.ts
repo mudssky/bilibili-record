@@ -33,5 +33,6 @@ function currentDateFormat(fmtStr: string) {
   //   console.log(opt)
   return fmtStr
 }
-
-export default { currentDateFormat }
+// 将秒数转化为指定格式的时间
+function timeFormat(seconds: number, conversionOptions: object) {}
+export default { currentDateFormat, timeFormat }
