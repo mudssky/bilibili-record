@@ -51,8 +51,17 @@ interface roomInit {
     live_time?: number
   }
 }
-
-// interface userInfo {}
+interface userInfo {
+  data?: {
+    info?: {
+      uid?: number
+      uname?: string
+      face?: string
+    }
+    follower_num?: number
+    medal_name?: string
+  }
+}
 // 判断直播间是否处于直播状态，是否已经开播
 async function isLiving(roomID: string): Promise<boolean> {
   const roomInitDataJSON = await getRoomInitData(roomID)
@@ -139,7 +148,7 @@ async function getRoomInfoByUID(uid: number): Promise<roomInfo> {
   const roomInfoObj = await response.json()
   return roomInfoObj
 }
-async function getUserInfo(uid: number): Promise<any> {
+async function getUserInfo(uid: number): Promise<userInfo> {
   const apiURL = `http://api.live.bilibili.com/live_user/v1/Master/info?uid=${uid}`
   const response = await myFetch(apiURL)
   const userInfo = await response.json()
