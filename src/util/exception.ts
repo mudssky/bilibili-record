@@ -1,9 +1,9 @@
 // 重试函数，可以指定重试函数和重试的间隔时间,时间单位是毫秒
 async function retryOnError(
-  func,
-  retryTimes: number = Infinity,
-  interval: number = 0
-) {
+  func: { (): Promise<void> },
+  retryTimes: number,
+  interval = 0
+): Promise<void> {
   let retryCount = 0
   try {
     await func()

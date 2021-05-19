@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+import fetch, { Response as fResponse } from 'node-fetch'
 
 const customHeader = {
   Referer: 'https://www.bilibili.com',
@@ -11,7 +11,7 @@ async function myFetch(
   fetchConfig = {
     headers: customHeader,
   }
-) {
+): Promise<fResponse> {
   return fetch(url, fetchConfig)
 }
 

@@ -29,24 +29,38 @@ program
   .option(
     '-rt --retry-times <number>',
     '下载中出现错误后重试的次数',
-    parseInt,
+    cliParseInt,
     100
   )
   .option(
-    '-ri --retry-interval <seconds>',
+    '-ri --retry-interval <millisseconds>',
     '下载出错重试的时间间隔',
-    parseInt,
+    cliParseInt,
     100
   )
-
+  .option(
+    '-w --watch',
+    '开启监视模式,每隔一段时间检测看是否开播，开播了就启动录制',
+    true
+  )
+  .option(
+    '-wi --watch-interval <milliseconds>',
+    '监听时请求的时间间隔,单位时毫秒,默认是6分钟',
+    cliParseInt,
+    1000 * 60 * 6
+  )
+function cliParseInt(value: string) {
+  return parseInt(value)
+}
+// 全局变量，存放监控的房间是否处于开播状态
+const roomMap = {}
 program.parse(process.argv)
 const options = program.opts()
 if (options.debug) {
   console.log(options)
 }
 // 避免await顶层调用
-;(async function () {
-  // console.dir('roomid:', options.roomID)
+async function main() {
   const [liveOptions, durlObj] = await Promise.all([
     bilibiliLiveAPI.collectRoomData(options.roomID),
     bilibiliLiveAPI.getRoomVideoData(options.roomID),
@@ -59,7 +73,6 @@ if (options.debug) {
   }
   if (durlObj.code === 0) {
     const durl = durlObj.data.durl
-
     const downloadFN = async function () {
       const filename = await bilibiliLiveAPI.parseFilenameTemplate(
         options.filenameTemplate,
@@ -84,10 +97,23 @@ if (options.debug) {
         filePath
       )
     }
+
     if (durl) {
-      retryOnError(downloadFN, options.retryTimes, 100)
+      await retryOnError(downloadFN, options.retryTimes, 100)
     } else {
       console.error(`请求失败，durl${durl}`)
     }
+  } else {
+    console.error('请求durl失败')
   }
+}
+
+;(async () => {
+  await bilibiliLiveAPI.wacthRoom(
+    { roomID: options.roomID, interval: options.watchInterval },
+    roomMap,
+    main
+  )
 })()
+
+// console.log(typeof main)

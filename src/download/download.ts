@@ -12,7 +12,7 @@ interface downloadOptions {
 async function downloadFlvStream(
   downloadOptions: downloadOptions,
   fileName: string
-) {
+): Promise<void> {
   const response = await fetch(downloadOptions.streamURL)
   console.log(response)
   if (!response.ok) {
@@ -28,7 +28,7 @@ async function downloadFlvStream(
         p.elapsed / 60
       )}min,download speed:${p.rateh}\r`
     )
-    if (p.elapsed === 0) {
+    if (p.rateh === 0) {
       throw new Error('download speed is 0 ,retry...')
     }
   })
@@ -38,11 +38,8 @@ async function downloadFlvStream(
   await streamPipeline(response.body, createWriteStream(fileName))
 }
 
-async function liveProgress() {}
-
 export default {
   downloadFlvStream,
-  liveProgress,
 }
 // console.log(
 //   // p.total,直播流没有总大小

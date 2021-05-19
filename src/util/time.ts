@@ -1,4 +1,4 @@
-function currentDateFormat(fmtStr: string) {
+function currentDateFormat(fmtStr: string): string {
   const currentDate = new Date()
   const opt = {
     yyyy: currentDate.getFullYear(), // 年
@@ -33,6 +33,4 @@ function currentDateFormat(fmtStr: string) {
   //   console.log(opt)
   return fmtStr
 }
-// 将秒数转化为指定格式的时间
-function timeFormat(seconds: number, conversionOptions: object) {}
-export default { currentDateFormat, timeFormat }
+export default { currentDateFormat }
