@@ -51,6 +51,8 @@ interface roomInit {
     live_time?: number
   }
 }
+
+// interface userInfo {}
 // 判断直播间是否处于直播状态，是否已经开播
 async function isLiving(roomID: string): Promise<boolean> {
   const roomInitDataJSON = await getRoomInitData(roomID)
@@ -113,7 +115,10 @@ function parseRoomID(roomURL: string): string {
   return roomID
 }
 // 这里用 {} 语法来显示提供的参数，将把{title}和里面的变量替换为实际的参数
-function parseFilenameTemplate(templateStr: string, roomData: roomData) {
+function parseFilenameTemplate(
+  templateStr: string,
+  roomData: roomData
+): string {
   let resFilename = templateStr
   const matchList = templateStr.matchAll(/{\s*([a-zA-Z]+)\s*}/g)
   for (const matchItem of matchList) {
@@ -180,9 +185,9 @@ async function wacthRoom(
     roomID: string
     interval: number
   },
-  roomMap,
+  roomMap: { [x: string]: boolean },
   callback: { (): Promise<void> }
-) {
+): Promise<void> {
   // 用一个map存放当前房间的录制状况，初始值是false，也就是没开始录制
   // 之后开始录制会把这个值设置成true，录制完成时会设置这个值为false，
   // 所以当这个值为true的时候时录制中，这时不进行检查

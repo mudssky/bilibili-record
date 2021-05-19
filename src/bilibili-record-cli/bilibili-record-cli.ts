@@ -53,7 +53,7 @@ function cliParseInt(value: string) {
   return parseInt(value)
 }
 // 全局变量，存放监控的房间是否处于开播状态
-const roomMap = {}
+const roomMap: { [x: string]: boolean } = {}
 program.parse(process.argv)
 const options = program.opts()
 if (options.debug) {
