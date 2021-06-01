@@ -44,11 +44,13 @@ async function saveConfig(path: string, configJSON: configObj): Promise<void> {
 }
 // 判断当前配置中是否已经有roomID，防止加入重复的roomID
 function hasRoomID(configJSON: configObj, roomID: string): boolean {
-  configJSON.roomList.forEach(function (item) {
+  for (const item of configJSON.roomList) {
     if (item.roomID === roomID) {
+      // console.log(item.roomID, roomID)
       return true
     }
-  })
+  }
+  // console.log('hello')
   return false
 }
 export default {
