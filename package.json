@@ -41,7 +41,8 @@
     "test": "mocha",
     "prepare": "husky install",
     "watch": "tsc -w",
-    "cli": "npx ts-node ./src/bilibili-record-cli/bilibili-record-cli.ts"
+    "cli": "npx ts-node ./src/bilibili-record-cli/bilibili-record-cli.ts",
+    "start": "npx ts-node ./src/main.ts"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts}": [

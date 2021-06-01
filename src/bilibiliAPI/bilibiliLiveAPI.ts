@@ -14,7 +14,7 @@ enum qualityCodePC {
   '高清' = 150,
   '流畅' = 80,
 }
-interface roomData {
+export interface collectedRoomData {
   roomID?: number
   uid?: number
   liveStatus?: number
@@ -93,8 +93,18 @@ async function getRoomInitData(roomID: string): Promise<roomInit> {
   if (resJSON.code === 0) {
     return resJSON
   } else {
-    throw new Error('live room not found')
+    throw new Error(`live room not found, errorcode:${resJSON.code}`)
   }
+}
+
+async function roomIsExist(roomID: string): Promise<boolean> {
+  const apiURL = `http://api.live.bilibili.com/room/v1/Room/room_init?id=${roomID}`
+  const response = await myFetch(apiURL)
+  const resJSON = await response.json()
+  if (resJSON.code === 0) {
+    return true
+  }
+  return false
 }
 
 // 获取视频下载地址相关信息
@@ -126,7 +136,7 @@ function parseRoomID(roomURL: string): string {
 // 这里用 {} 语法来显示提供的参数，将把{title}和里面的变量替换为实际的参数
 function parseFilenameTemplate(
   templateStr: string,
-  roomData: roomData
+  roomData: collectedRoomData
 ): string {
   let resFilename = templateStr
   const matchList = templateStr.matchAll(/{\s*([a-zA-Z]+)\s*}/g)
@@ -158,8 +168,8 @@ async function getUserInfo(uid: number): Promise<userInfo> {
 async function collectRoomData(
   roomID: string
   // qn: qualityCodePC = qualityCodePC.原画
-): Promise<roomData> {
-  const roomDataObj: roomData = {}
+): Promise<collectedRoomData> {
+  const roomDataObj: collectedRoomData = {}
   const roomInitData = await getRoomInitData(roomID)
   const uid = roomInitData.data.uid
   const [roomInfoObj, userInfoObj] = await Promise.all([
@@ -235,6 +245,7 @@ export default {
   liveStatus,
   qualityCodePC,
   wacthRoom,
+  roomIsExist,
 }
 // export { getRoomInitData }
 // testsdadas
