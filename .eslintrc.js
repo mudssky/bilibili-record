@@ -18,5 +18,6 @@ module.exports = {
     // 默认的unused var在typescript中有问题
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
+    'vue/valid-template-root': 'off',
   },
 }
